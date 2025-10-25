@@ -1,0 +1,37 @@
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+<AuthorizeView>
+    <Authorized Context="authState">
+        <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-600">@authState.User.Identity?.Name</span>
+            <button class="text-iosPrimary text-sm" @onclick="BeginLogout">Sign out</button>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <button class="bg-iosPrimary text-white text-sm font-medium px-4 py-2 rounded-full shadow-ios" @onclick="BeginLogin">Sign in</button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    [Inject]
+    public NavigationManager Navigation { get; set; } = default!;
+
+    private async Task BeginLogin()
+    {
+        var auth = (await AuthenticationStateTask!)?.User;
+        if (auth?.Identity?.IsAuthenticated == true)
+        {
+            return;
+        }
+
+        Navigation.NavigateTo("authentication/login");
+    }
+
+    private void BeginLogout()
+    {
+        Navigation.NavigateTo("authentication/logout");
+    }
+}
