@@ -1,0 +1,77 @@
+@inherits LayoutComponentBase
+
+<div class="min-h-screen bg-gradient-to-b from-slate-100 to-white text-slate-900">
+    <header class="sticky top-0 z-30 backdrop-blur bg-white/70 border-b border-white/60">
+        <div class="mx-auto flex max-w-xl items-center justify-between px-5 py-4">
+            <div>
+                <p class="text-xs uppercase tracking-[0.4em] text-slate-400">Dashboard</p>
+                <h1 class="text-2xl font-semibold text-slate-900">Blazor Auth Sample</h1>
+            </div>
+            <AuthorizeView>
+                <Authorized>
+                    <ProfileMenu />
+                </Authorized>
+                <NotAuthorized>
+                    <LoginButton />
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-xl px-5 pb-24 pt-6">
+        @Body
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-xl rounded-t-3xl border border-slate-200 bg-white/90 px-10 pb-8 pt-4 shadow-[0_-10px_30px_rgba(15,23,42,0.07)] backdrop-blur">
+        <nav class="flex items-center justify-between text-xs font-medium text-slate-500">
+            <a href="/" class="flex flex-col items-center gap-1 text-indigo-500">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 shadow-inner">🏠</span>
+                Home
+            </a>
+            <button class="flex flex-col items-center gap-1">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-400 shadow-inner">🔔</span>
+                Alerts
+            </button>
+            <button class="flex flex-col items-center gap-1">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-400 shadow-inner">⚙️</span>
+                Settings
+            </button>
+        </nav>
+        <div class="mt-4 text-center text-[0.65rem] text-slate-400">Crafted with an iOS-inspired design language.</div>
+    </footer>
+</div>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+    [Inject] public SignOutSessionStateManager SignOutManager { get; set; } = default!;
+
+    private async Task SignOutAsync()
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+
+    private void SignIn() => Navigation.NavigateTo("authentication/login");
+}
+
+@code {
+    private RenderFragment ProfileMenu => builder =>
+    {
+        builder.OpenElement(0, "button");
+        builder.AddAttribute(1, "class", "inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg shadow-slate-900/20");
+        builder.AddAttribute(2, "onclick", EventCallback.Factory.Create(this, SignOutAsync));
+        builder.AddContent(3, "⎋");
+        builder.CloseElement();
+    };
+
+    private RenderFragment LoginButton => builder =>
+    {
+        builder.OpenElement(0, "button");
+        builder.AddAttribute(1, "class", "inline-flex items-center rounded-full bg-indigo-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40");
+        builder.AddAttribute(2, "onclick", EventCallback.Factory.Create(this, SignIn));
+        builder.AddContent(3, "Sign in");
+        builder.CloseElement();
+    };
+}

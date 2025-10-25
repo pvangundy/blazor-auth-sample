@@ -1,0 +1,98 @@
+@page "/"
+@attribute [Authorize]
+
+<PageTitle>Today</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <section class="space-y-6">
+            <div class="rounded-3xl bg-white/80 p-6 shadow-xl shadow-indigo-200/30 backdrop-blur">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Current Location</p>
+                        <h2 class="text-3xl font-semibold text-slate-900">@CurrentLocation</h2>
+                    </div>
+                    <button class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/20">Refresh</button>
+                </div>
+                <div class="mt-6 flex items-end justify-between">
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.3em] text-indigo-400">Now</p>
+                        <p class="mt-1 text-6xl font-semibold text-slate-900">72°</p>
+                    </div>
+                    <div class="flex flex-col items-end text-right text-sm text-slate-500">
+                        <span>Feels like 74°</span>
+                        <span>Humidity 58%</span>
+                        <span>Wind 4 mph</span>
+                    </div>
+                </div>
+            </div>
+
+            <article class="rounded-3xl bg-white p-6 shadow-xl shadow-slate-200/50">
+                <header class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-slate-900">Forecast</h2>
+                    <span class="text-xs font-medium text-indigo-500">Next 5 days</span>
+                </header>
+
+                <div class="mt-4 divide-y divide-slate-100">
+                    @if (Forecasts is null)
+                    {
+                        <div class="py-6 text-center text-sm text-slate-400">Loading forecast…</div>
+                    }
+                    else if (Forecasts.Count == 0)
+                    {
+                        <div class="py-6 text-center text-sm text-slate-400">No forecasts available. Seed your database.</div>
+                    }
+                    else
+                    {
+                        foreach (var forecast in Forecasts)
+                        {
+                            <div class="flex items-center justify-between py-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="text-2xl">☀️</div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900">@forecast.Date.ToString("dddd")</p>
+                                        <p class="text-xs text-slate-400">@forecast.Summary</p>
+                                    </div>
+                                </div>
+                                <div class="text-sm font-semibold text-slate-600">@forecast.TemperatureC°</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </article>
+        </section>
+    </Authorized>
+    <NotAuthorized>
+        <div class="flex min-h-[60vh] items-center justify-center">
+            <div class="rounded-3xl bg-white/80 p-10 text-center shadow-xl shadow-indigo-100/80 backdrop-blur">
+                <h2 class="text-2xl font-semibold text-slate-900">Welcome back</h2>
+                <p class="mt-2 text-sm text-slate-500">Sign in with your Azure Entra ID account to see personalized data.</p>
+                <button class="mt-6 inline-flex items-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-400/50" @onclick="BeginSignIn">
+                    Sign in
+                </button>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Inject] public IWeatherApiClient WeatherApi { get; set; } = default!;
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    private IReadOnlyList<WeatherForecastDto>? Forecasts { get; set; }
+    private string CurrentLocation { get; set; } = "Seattle";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Forecasts = await WeatherApi.GetForecastAsync();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
+
+    private void BeginSignIn() => Navigation.NavigateTo("authentication/login");
+}
