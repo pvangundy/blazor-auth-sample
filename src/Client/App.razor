@@ -1,0 +1,39 @@
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                <NotAuthorized>
+                    <LayoutView Layout="typeof(MainLayout)">
+                        <section class="pt-6">
+                            <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-4">
+                                <h2 class="text-xl font-semibold text-gray-900">Access denied</h2>
+                                <p class="text-sm text-gray-600">You are not authorized to view this page.</p>
+                                <LoginButton />
+                            </article>
+                        </section>
+                    </LayoutView>
+                </NotAuthorized>
+                <Authorizing>
+                    <LayoutView Layout="typeof(MainLayout)">
+                        <section class="pt-6">
+                            <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-4">
+                                <p class="text-sm text-gray-500">Authorizing...</p>
+                            </article>
+                        </section>
+                    </LayoutView>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="typeof(MainLayout)">
+                <section class="pt-6">
+                    <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-4">
+                        <h2 class="text-xl font-semibold text-gray-900">Page not found</h2>
+                        <p class="text-sm text-gray-600">Sorry, the page you requested does not exist.</p>
+                    </article>
+                </section>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

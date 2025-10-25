@@ -1,0 +1,67 @@
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+@if (authenticationState is null)
+{
+    <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 shadow-ios border border-white/50">
+        <span class="w-9 h-9 rounded-full bg-gradient-to-br from-ios-primary to-blue-600 flex items-center justify-center text-white font-semibold">?</span>
+        <span class="text-sm font-medium text-gray-900">Loading...</span>
+    </button>
+}
+else
+{
+    <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 shadow-ios border border-white/50"
+            @onclick="ToggleMenu">
+        <span class="w-9 h-9 rounded-full bg-gradient-to-br from-ios-primary to-blue-600 flex items-center justify-center text-white font-semibold">@Initials</span>
+        <span class="text-sm font-medium text-gray-900">@DisplayName</span>
+    </button>
+
+    @if (isMenuOpen)
+    {
+        <div class="absolute right-0 mt-2 w-40 rounded-2xl bg-white shadow-ios border border-white/50 py-2">
+            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" @onclick="BeginSignOut">Sign out</button>
+        </div>
+    }
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private AuthenticationState? authenticationState;
+    private bool isMenuOpen;
+
+    private string DisplayName => authenticationState?.User.Identity?.Name ?? "User";
+
+    private string Initials
+    {
+        get
+        {
+            var parts = DisplayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+            {
+                return "U";
+            }
+
+            var initials = string.Join(string.Empty, parts.Select(p => char.ToUpperInvariant(p[0])));
+            return initials.Substring(0, Math.Min(2, initials.Length));
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthenticationStateTask is not null)
+        {
+            authenticationState = await AuthenticationStateTask;
+        }
+    }
+
+    private void ToggleMenu() => isMenuOpen = !isMenuOpen;
+
+    private async Task BeginSignOut()
+    {
+        isMenuOpen = false;
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

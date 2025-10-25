@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-ios-background text-gray-900 font-sans;
+}
+
+.nav-link-icon {
+  @apply text-inherit;
+}
+
+a.active {
+  @apply text-ios-primary font-semibold;
+}
+
+a .nav-link-icon {
+  @apply w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 transition-all duration-200;
+}
+
+a.active .nav-link-icon {
+  @apply bg-ios-primary text-white shadow-ios;
+}

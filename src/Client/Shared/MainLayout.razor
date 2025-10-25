@@ -1,0 +1,70 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<div class="min-h-screen flex flex-col bg-ios-background">
+    <header class="backdrop-blur bg-white/70 sticky top-0 z-10 border-b border-white/40">
+        <div class="px-6 pt-12 pb-4 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">@CurrentTitle</h1>
+                <p class="text-sm text-gray-500">Your mobile-first Blazor experience</p>
+            </div>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="relative">
+                        <ProfileMenu />
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <LoginButton />
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </header>
+
+    <main class="flex-1 px-4 pb-24">
+        <div class="max-w-md mx-auto">
+            @Body
+        </div>
+    </main>
+
+    <MobileNavMenu />
+</div>
+
+@code {
+    private string CurrentTitle { get; set; } = "Welcome";
+    private EventHandler<LocationChangedEventArgs>? _locationHandler;
+
+    protected override void OnInitialized()
+    {
+        UpdateTitle();
+        _locationHandler = (_, __) =>
+        {
+            UpdateTitle();
+            InvokeAsync(StateHasChanged);
+        };
+        NavigationManager.LocationChanged += _locationHandler;
+    }
+
+    private void UpdateTitle()
+    {
+        var path = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            CurrentTitle = "Home";
+            return;
+        }
+
+        var route = path.Split('?', '#').FirstOrDefault() ?? path;
+        route = route.Replace('-', ' ');
+        CurrentTitle = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(route);
+    }
+
+    public void Dispose()
+    {
+        if (_locationHandler is not null)
+        {
+            NavigationManager.LocationChanged -= _locationHandler;
+        }
+    }
+}
