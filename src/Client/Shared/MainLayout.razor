@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+
+<div class="min-h-screen bg-iosSurface flex flex-col">
+    <header class="backdrop-blur bg-white/80 border-b border-gray-200 sticky top-0 z-10">
+        <div class="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="text-xl font-semibold text-gray-900">Pulse</div>
+            <LoginDisplay />
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-lg w-full mx-auto px-4 py-6">
+        <div class="bg-white rounded-3xl shadow-ios p-6">
+            @Body
+        </div>
+    </main>
+
+    <footer class="max-w-lg mx-auto w-full px-4 pb-6">
+        <nav class="bg-white/90 backdrop-blur rounded-3xl shadow-ios flex justify-around py-3">
+            <NavLink class="flex flex-col items-center text-xs text-gray-500" ActiveClass="text-iosPrimary" href="/">
+                <span class="material-icons text-lg">cloud</span>
+                Dashboard
+            </NavLink>
+            <NavLink class="flex flex-col items-center text-xs text-gray-500" ActiveClass="text-iosPrimary" href="/weather">
+                <span class="material-icons text-lg">calendar_today</span>
+                Forecast
+            </NavLink>
+        </nav>
+    </footer>
+</div>

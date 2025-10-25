@@ -1,0 +1,43 @@
+@page "/weather"
+@inject WeatherForecastService Service
+@using BlazorAuthSample.Client.Features.Weather.Components
+
+<PageTitle>Forecast</PageTitle>
+
+<section class="space-y-6">
+    <header class="space-y-1">
+        <h1 class="text-3xl font-semibold text-gray-900">Forecast</h1>
+        <p class="text-gray-500">Tap a day to view the expected temperature trend.</p>
+    </header>
+
+    @if (_forecasts is null)
+    {
+        <div class="flex items-center justify-center py-12">
+            <span class="text-gray-400">Loading forecast...</span>
+        </div>
+    }
+    else if (_forecasts.Count == 0)
+    {
+        <div class="flex items-center justify-center py-12">
+            <span class="text-gray-400">No data available.</span>
+        </div>
+    }
+    else
+    {
+        <ul class="space-y-3">
+            @foreach (var forecast in _forecasts)
+            {
+                <WeatherForecastCard Forecast="forecast" />
+            }
+        </ul>
+    }
+</section>
+
+@code {
+    private IReadOnlyList<WeatherForecastDto>? _forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _forecasts = await Service.GetForecastAsync();
+    }
+}
