@@ -1,0 +1,80 @@
+@page "/weather"
+@layout MainLayout
+@inject WeatherForecastClient ForecastClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Weather</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <section class="pt-6 space-y-4">
+            @if (isLoading)
+            {
+                <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-4">
+                    <p class="text-sm text-gray-500">Loading secure forecast...</p>
+                </article>
+            }
+            else if (!string.IsNullOrEmpty(error))
+            {
+                <article class="bg-red-50 border border-red-200 rounded-ios p-6 space-y-2">
+                    <h2 class="text-lg font-semibold text-red-600">Unable to load data</h2>
+                    <p class="text-sm text-red-500">@error</p>
+                </article>
+            }
+            else
+            {
+                @foreach (var forecast in forecasts)
+                {
+                    <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-2">
+                        <h3 class="text-lg font-semibold text-gray-900">@forecast.Date.ToString("MMM dd")</h3>
+                        <p class="text-sm text-gray-500">@forecast.Summary</p>
+                        <p class="text-3xl font-bold text-ios-primary">@forecast.TemperatureC°C</p>
+                    </article>
+                }
+            }
+        </section>
+    </Authorized>
+    <NotAuthorized>
+        <section class="pt-6">
+            <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-4">
+                <h2 class="text-xl font-semibold text-gray-900">Sign in required</h2>
+                <p class="text-sm text-gray-600">Please sign in to view secure weather data from the API.</p>
+                <LoginButton />
+            </article>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private IReadOnlyList<WeatherForecast> forecasts = Array.Empty<WeatherForecast>();
+    private bool isLoading = true;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (!(authState.User.Identity?.IsAuthenticated ?? false))
+        {
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            var result = await ForecastClient.GetForecastAsync();
+            forecasts = result.ToList();
+        }
+        catch (AccessTokenNotAvailableException ex)
+        {
+            ex.Redirect();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

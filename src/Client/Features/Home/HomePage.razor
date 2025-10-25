@@ -1,0 +1,32 @@
+@page "/"
+@layout MainLayout
+
+<PageTitle>Home</PageTitle>
+
+<section class="space-y-6 pt-6">
+    <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-4">
+        <h2 class="text-xl font-semibold text-gray-900">Hello!</h2>
+        <p class="text-sm text-gray-600 leading-relaxed">
+            This template pairs a Blazor WebAssembly frontend with an ASP.NET Core Web API backend secured by Azure Entra ID. Tailwind CSS powers the iOS-inspired design language so your app feels right at home on mobile devices.
+        </p>
+        <AuthorizeView>
+            <Authorized>
+                <p class="text-sm text-ios-primary font-medium">You're signed in and ready to call secure APIs.</p>
+            </Authorized>
+            <NotAuthorized>
+                <p class="text-sm text-gray-500">Sign in to access personalized content and secure features.</p>
+                <LoginButton />
+            </NotAuthorized>
+        </AuthorizeView>
+    </article>
+
+    <article class="bg-ios-card backdrop-blur rounded-ios shadow-ios border border-white/60 p-6 space-y-4">
+        <h3 class="text-lg font-semibold text-gray-900">Template Highlights</h3>
+        <ul class="text-sm text-gray-600 space-y-2">
+            <li>🔐 Azure Entra ID protected APIs and UI</li>
+            <li>🎯 Feature-sliced folder structure</li>
+            <li>⚡ Tailwind CLI build pipeline</li>
+            <li>🗄️ Dapper-powered data layer</li>
+        </ul>
+    </article>
+</section>

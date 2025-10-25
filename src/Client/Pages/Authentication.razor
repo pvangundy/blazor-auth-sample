@@ -1,0 +1,10 @@
+@page "/authentication/{Action}" 
+
+<PageTitle>Authentication</PageTitle>
+
+<RemoteAuthenticatorView Action="@Action" />
+
+@code {
+    [Parameter]
+    public string? Action { get; set; }
+}

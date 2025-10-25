@@ -1,0 +1,10 @@
+@inject NavigationManager Navigation
+
+<button class="px-4 py-2 rounded-full bg-ios-primary text-white font-semibold shadow-ios"
+        @onclick="TriggerLogin">
+    Sign in
+</button>
+
+@code {
+    private void TriggerLogin() => Navigation.NavigateTo("authentication/login");
+}
